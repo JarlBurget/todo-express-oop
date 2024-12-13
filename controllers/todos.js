@@ -4,7 +4,7 @@ import { fileManager } from '../utils/files.js'
 class todoController {
     constructor(){
         //hold todo objects in array
-        this.initTODOS() 
+        this.initTodos() 
     } 
 
     async createTodo(req, res){
@@ -38,7 +38,7 @@ class todoController {
         res.json({tasks: this.TODOS})
     }
 
-    updateTodo(req, res){
+    async updateTodo(req, res){
         const todoId = req.params.id
         const updatedTask = req.body.task
 
@@ -55,13 +55,16 @@ class todoController {
         }
 
         this.TODOS[todoIndex] = new Todo(this.TODOS[todoIndex].id, updatedTask)
+        
+        await fileManager.writeFile('./data/todos.json', this.TODOS)
+        
         res.json({
             message: 'todo is updated',
             updatedTask: this.TODOS[todoIndex]
         })
         }
 
-        deleteTodo(req, res) {
+        async deleteTodo(req, res) {
             const todoId = req.params.id;
             const todoIndex = this.TODOS.findIndex((todo) => todo.id === todoId);
     
@@ -72,6 +75,9 @@ class todoController {
             }
     
             const deletedTodo = this.TODOS.splice(todoIndex, 1); // Eemalda element massiivist
+            
+            await fileManager.writeFile('./data/todos.json', this.TODOS)
+            
             res.json({
                 message: 'Todo deleted successfully',
                 deletedTask: deletedTodo
